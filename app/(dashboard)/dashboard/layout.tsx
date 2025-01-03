@@ -15,10 +15,11 @@ export default function DashboardLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
-    { href: '/dashboard', icon: Users, label: 'Team' },
-    { href: '/dashboard/general', icon: Settings, label: 'General' },
-    { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
-    { href: '/dashboard/security', icon: Shield, label: 'Security' },
+    { href: '/dashboard', icon: Users, label: 'Ana Sayfa' },
+    { href: '/dashboard/general', icon: Settings, label: 'Genel' },
+    { href: '/dashboard/activity', icon: Activity, label: 'Kullanıcı İşlemleri' },
+    { href: '/dashboard/security', icon: Shield, label: 'Güvenlik' },
+    { href: '/dashboard/siparis', icon: Shield, label: 'Sipariş' },
   ];
 
   return (
@@ -26,7 +27,7 @@ export default function DashboardLayout({
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between bg-white border-b border-gray-200 p-4">
         <div className="flex items-center">
-          <span className="font-medium">Settings</span>
+          <span className="font-medium">Ayarlar</span>
         </div>
         <Button
           className="-mr-3"

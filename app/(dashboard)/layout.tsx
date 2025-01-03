@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useUser } from '@/lib/auth';
 import { signOut } from '@/app/(login)/actions';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,17 +30,19 @@ function Header() {
   return (
     <header className="border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
-          <CircleIcon className="h-6 w-6 text-orange-500" />
-          <span className="ml-2 text-xl font-semibold text-gray-900">ACME</span>
-        </Link>
+      <Link href="/" className="flex items-center">
+      <div className="bg-black p-2 inline-flex items-center justify-center">
+  <Image src="https://ipekcarpet.com.tr/app/Images/logolight_1661258553.svg" alt="Logo" height={150} width={150} className="text-orange-500" />
+</div>
+      <span className="ml-2 text-xl font-semibold text-gray-900">B2B::NetLoom</span>
+    </Link>
         <div className="flex items-center space-x-4">
-          <Link
+{/*           <Link
             href="/pricing"
             className="text-sm font-medium text-gray-700 hover:text-gray-900"
           >
             Pricing
-          </Link>
+          </Link> */}
           {user ? (
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
@@ -71,12 +74,21 @@ function Header() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
+            <div className="flex items-center space-x-2">
             <Button
               asChild
               className="bg-black hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-full"
             >
-              <Link href="/sign-up">Sign Up</Link>
+              <Link href="/sign-up">Üye Ol</Link>
             </Button>
+            <Button
+              asChild
+              className="bg-black hover:bg-gray-800 text-white text-sm px-4 py-2 rounded-full"
+            >
+              <Link href="/sign-in">Giriş Yap</Link>
+            </Button>
+          </div>
+            
           )}
         </div>
       </div>

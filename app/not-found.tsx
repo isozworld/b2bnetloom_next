@@ -12,14 +12,14 @@ export default function NotFound() {
           Page Not Found
         </h1>
         <p className="text-base text-gray-500">
-          The page you are looking for might have been removed, had its name
-          changed, or is temporarily unavailable.
+          Aradığınız sayfa kaldırılmış, adı değiştirilmiş veya geçici olarak
+          kullanılamıyor olabilir.
         </p>
         <Link
           href="/"
           className="max-w-48 mx-auto flex justify-center py-2 px-4 border border-gray-300 rounded-full shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
         >
-          Back to Home
+          Ana Sayfaya Dön
         </Link>
       </div>
     </div>
