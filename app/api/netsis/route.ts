@@ -5,7 +5,7 @@ const NETSIS_USER = process.env.NETSIS_USER!;
 const NETSIS_PASSWORD = process.env.NETSIS_PASSEORD!;
 const NETSIS_SIRKET = process.env.NETSIS_SIRKET!;
 const NETSIS_SUBE = process.env.NETSIS_SUBE!;
-const NETSIS_DBUSER = 'TEMELSET';
+const NETSIS_DBUSER = process.env.NETSIS_DBUSER!;
 const NETSIS_DBPASSWORD = '';
 const NETSIS_DBTYPE = 0;
 
@@ -14,94 +14,100 @@ let tokenExpiration: number | null = null; // Token süresi
 
 // Token al
 async function loginToNetsis() {
-    const url = `${BASE_URL}/api/v2/token`;
-    console.log("url",url);
-    const body = new URLSearchParams({
-        grant_type: 'password',
-        branchcode: NETSIS_SUBE, // Convert to string
-        password: NETSIS_PASSWORD,
-        username: NETSIS_USER,
-        dbname: NETSIS_SIRKET,
-        dbuser: NETSIS_DBUSER,
-        dbpassword: NETSIS_DBPASSWORD,
-        dbtype: NETSIS_DBTYPE.toString(), // Convert to string
-      });
-  
-    console.log(body.toString()); // Veriyi URL-encoded formatında logla
-  
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: body.toString(),
-    });
- 
-    if (!response) {
-      throw new Error(`Login failed: ${response}`);
-    }
-  
-    const data = await response.json();
-    token = data.access_token;
-    console.log("token:::::::::::", token);
-    const tokenExpiration = Date.now() + data.expires_in * 1000; // expires_in saniye cinsindedir
+  const url = `${BASE_URL}/api/v2/token`;
+  const body = new URLSearchParams({
+    grant_type: 'password',
+    branchcode: NETSIS_SUBE,
+    password: NETSIS_PASSWORD,
+    username: NETSIS_USER,
+    dbname: NETSIS_SIRKET,
+    dbuser: NETSIS_DBUSER,
+    dbpassword: NETSIS_DBPASSWORD,
+    dbtype: NETSIS_DBTYPE.toString(),
+  });
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body.toString(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Login failed: ${response.status} ${response.statusText}`);
   }
-  
+
+  const data = await response.json();
+  token = data.access_token;
+  tokenExpiration = Date.now() + data.expires_in * 1000;
+}
 
 // Token kontrol ve yenileme
 async function ensureToken() {
   if (!token || !tokenExpiration || Date.now() >= tokenExpiration) {
-    console.log('Token expired or missing. Logging in...');
     await loginToNetsis();
   }
 }
 
 // Netsis API çağrısı
-async function callNetsisAPI(endpoint: string, method: string = 'GET', body?: Record<string, any>) {
-    await ensureToken(); // Token kontrol
-  
-    const url = `${BASE_URL}/${endpoint}`;
+async function callNetsisAPI(
+  endpoint: string,
+  method: string = 'GET',
+  params?: Record<string, any>,
+  body?: Record<string, any>,
+  customHeaders?: Record<string, string>
+): Promise<any> {
+  try {
+    await ensureToken();
+
+    let url = `${BASE_URL}/${endpoint}`;
+
+    // Query string ekle
+    if (params) {
+      const queryString = new URLSearchParams(params).toString();
+      url += `?${queryString}`;
+    }
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
+      ...customHeaders,
     };
-  
-    const response = await fetch(url, {
-        method,
-        headers,
-        body: JSON.stringify({
-          Offset: 0,
-          Limit: 1, // Sadece gerekli alanları gönderin
-        }),
-      });
-      
+
+    const requestOptions: RequestInit = {
+      method,
+      headers,
+    };
+
+    if (body) {
+      requestOptions.body = JSON.stringify(body);
+    }
+
+    const response = await fetch(url, requestOptions);
 
     if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Netsis API Error:", errorText); // Hata mesajını detaylı logla
-        throw new Error(`Netsis API error: ${response.statusText}. ${errorText}`);
-      }
-      
-  
-    try {
-      const data = await response.json();
-      console.log("Response JSON:", data); // Yanıtı logla
-      return data;
-    } catch (error) {
-      throw new Error(`Failed to parse JSON response: ${error}`);
+      const errorText = await response.text();
+      throw new Error(
+        `Netsis API error: ${response.status} ${response.statusText}. Details: ${errorText}`
+      );
     }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error in callNetsisAPI:", error);
+    throw error;
   }
-  
+}
 
 // POST metodu
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { endpoint, payload } = body;
-    console.log("-----------------",endpoint);
-    console.log("-----------------",payload);
-    // Netsis API'ye çağrı yap
-    const data = await callNetsisAPI(endpoint, 'POST', payload);
+    const { endpoint, params, payload, headers } = body;
+
+    const data = await callNetsisAPI(endpoint, 'POST', params, payload, headers);
 
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
@@ -110,14 +116,21 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET metodu (örnek olarak ekledim)
+// GET metodu
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const endpoint = searchParams.get('endpoint') || '';
+    const params: Record<string, string> = {};
 
-    // Netsis API'ye çağrı yap
-    const data = await callNetsisAPI(endpoint, 'GET');
+    // Query string parametrelerini al
+    searchParams.forEach((value, key) => {
+      if (key !== 'endpoint') {
+        params[key] = value;
+      }
+    });
+
+    const data = await callNetsisAPI(endpoint, 'GET', params);
 
     return NextResponse.json({ success: true, data });
   } catch (error: any) {

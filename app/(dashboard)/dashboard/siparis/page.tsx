@@ -1,5 +1,4 @@
-'use client';
-
+'use client'
 import { useState, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,21 +17,18 @@ export default function SiparisPage() {
     setResponse(null);
 
     try {
-        const res = await fetch('/api/netsis', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              endpoint: 'api/v2/Items',
-              payload: {
-                Offset: 0,
-                Limit: 1,
-                Stok_Kodu: stokKodu
-              },
-            }),
-          });
-    
+      const queryParams = new URLSearchParams({
+        Offset: '0',
+        Limit: '10',
+        StokKodu: stokKodu,
+      }).toString();
+
+      const res = await fetch(`/api/netsis?endpoint=api/v2/Items&${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!res.ok) {
         throw new Error('API call failed');

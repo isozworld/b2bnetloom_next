@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Users, Settings, Shield, Activity, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -15,11 +15,18 @@ export default function DashboardLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navItems = [
-    { href: '/dashboard', icon: Users, label: 'Ana Sayfa' },
-    { href: '/dashboard/general', icon: Settings, label: 'Genel' },
-    { href: '/dashboard/activity', icon: Activity, label: 'Kullanıcı İşlemleri' },
-    { href: '/dashboard/security', icon: Shield, label: 'Güvenlik' },
-    { href: '/dashboard/siparis', icon: Shield, label: 'Sipariş' },
+    { href: '/dashboard', label: 'Ana Sayfa' },
+    { href: '/dashboard/general', label: 'Genel' },
+    { href: '/dashboard/activity', label: 'Kullanıcı İşlemleri' },
+    { href: '/dashboard/security', label: 'Güvenlik' },
+    { href: '/dashboard/siparis', label: 'Sipariş' },
+  ];
+
+  // Kategoriler yalnızca Sipariş sayfasında görünecek
+  const categories = [
+    { id: 1, label: 'Kategori 1' },
+    { id: 2, label: 'Kategori 2' },
+    { id: 3, label: 'Kategori 3' },
   ];
 
   return (
@@ -58,11 +65,23 @@ export default function DashboardLayout({
                   }`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                  <item.icon className="mr-2 h-4 w-4" />
                   {item.label}
                 </Button>
               </Link>
             ))}
+
+            {/* Sadece Sipariş sayfası için kategorileri göster */}
+            {pathname === '/dashboard/siparis' && (
+              <div className="mt-6">
+                <h2 className="text-lg font-medium mb-4">Kategoriler</h2>
+                {categories.map((category) => (
+                  <div key={category.id} className="flex items-center mb-2">
+                    <input type="checkbox" id={`category-${category.id}`} className="mr-2" />
+                    <label htmlFor={`category-${category.id}`}>{category.label}</label>
+                  </div>
+                ))}
+              </div>
+            )}
           </nav>
         </aside>
 

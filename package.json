@@ -46,6 +46,10 @@
     "tailwindcss-react-aria-components": "1.2.0",
     "typescript": "^5.7.2",
     "zod": "^3.24.1"
-  }
+  },
+  "devDependencies": {
+    "nx": "20.3.1",
+    "@nx/next": "20.3.1"
+  },
+  "nx": {}
 }
-
