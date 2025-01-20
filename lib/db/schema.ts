@@ -68,6 +68,26 @@ export const invitations = pgTable('invitations', {
   status: varchar('status', { length: 20 }).notNull().default('pending'),
 });
 
+export const shoppingCart = pgTable("shopping_cart", {
+  id: serial("id").primaryKey(), // Birincil anahtar
+  userId: integer("user_id").notNull().references(() => users.id), // users tablosuna foreign key
+  productCode: varchar("product_code", { length: 50 }).notNull(), // Ürün kodu
+  productName: varchar("product_name", { length: 100 }).notNull(), // Ürün adı
+  catalog: varchar("catalog", { length: 50 }).notNull(), // Katalog adı
+  variant: varchar("variant", { length: 50 }).notNull(), // Tür (örnek: Standart, Oval)
+  size: varchar("size", { length: 50 }).notNull(), // Ebat bilgisi
+  stockCode: varchar("stock_code", { length: 50 }).notNull(), // Stok kodu
+  quantity: integer("quantity").notNull().default(1), // Adet, varsayılan 1
+  createdAt: timestamp("created_at").notNull().defaultNow(), // Eklenme tarihi
+});
+
+export const cariRoles = pgTable('cari_roles',{
+  id: serial('id').primaryKey(),
+  userId: integer('user_id').notNull().references(() => users.id),
+  netsisCariKod: varchar('netsis_cari_kod', { length: 100 }).notNull(),
+  userRole: varchar('user_role', { length: 20 }).notNull().default('member'),
+});
+
 export const teamsRelations = relations(teams, ({ many }) => ({
   teamMembers: many(teamMembers),
   activityLogs: many(activityLogs),
@@ -111,6 +131,7 @@ export const activityLogsRelations = relations(activityLogs, ({ one }) => ({
     references: [users.id],
   }),
 }));
+ 
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -122,11 +143,13 @@ export type ActivityLog = typeof activityLogs.$inferSelect;
 export type NewActivityLog = typeof activityLogs.$inferInsert;
 export type Invitation = typeof invitations.$inferSelect;
 export type NewInvitation = typeof invitations.$inferInsert;
+export type CariRole = typeof cariRoles.$inferInsert;
 export type TeamDataWithMembers = Team & {
   teamMembers: (TeamMember & {
     user: Pick<User, 'id' | 'name' | 'email'>;
   })[];
 };
+export type ShoppingCart = typeof shoppingCart.$inferInsert;
 
 export enum ActivityType {
   SIGN_UP = 'SIGN_UP',
@@ -139,4 +162,9 @@ export enum ActivityType {
   REMOVE_TEAM_MEMBER = 'REMOVE_TEAM_MEMBER',
   INVITE_TEAM_MEMBER = 'INVITE_TEAM_MEMBER',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
+}
+export enum UserRole {
+  admin = 'admin',
+  bayi = 'bayi',
+  member = 'member',
 }

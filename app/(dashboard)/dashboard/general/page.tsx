@@ -38,32 +38,32 @@ export default function GeneralPage() {
   return (
     <section className="flex-1 p-4 lg:p-8">
       <h1 className="text-lg lg:text-2xl font-medium text-gray-900 mb-6">
-        General Settings
+        Genel Ayarlar
       </h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Account Information</CardTitle>
+          <CardTitle>Hesap Bilgileri</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Adınız</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="Enter your name"
+                placeholder="Adınızı giriniz"
                 defaultValue={user?.name || ''}
                 required
               />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email Adresiniz</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Email adresinizi giriniz"
                 defaultValue={user?.email || ''}
                 required
               />
@@ -82,10 +82,10 @@ export default function GeneralPage() {
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
+                  Değişiklikler Kaydediliyor...
                 </>
               ) : (
-                'Save Changes'
+                'Değişiklikleri Kaydet'
               )}
             </Button>
           </form>

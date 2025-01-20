@@ -31,40 +31,40 @@ function getRelativeTime(date: Date) {
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) return 'just now';
+  if (diffInSeconds < 60) return 'şimdi';
   if (diffInSeconds < 3600)
-    return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    return `${Math.floor(diffInSeconds / 60)} dakika önce`;
   if (diffInSeconds < 86400)
-    return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    return `${Math.floor(diffInSeconds / 3600)} saat önce`;
   if (diffInSeconds < 604800)
-    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    return `${Math.floor(diffInSeconds / 86400)} gün önce`;
   return date.toLocaleDateString();
 }
 
 function formatAction(action: ActivityType): string {
   switch (action) {
     case ActivityType.SIGN_UP:
-      return 'You signed up';
+      return 'Hesabınız oluşturuldu';
     case ActivityType.SIGN_IN:
-      return 'You signed in';
+      return 'Hesabınıza giriş yapıldı';
     case ActivityType.SIGN_OUT:
-      return 'You signed out';
+      return 'Hesabınızdan çıkış yapıldı';
     case ActivityType.UPDATE_PASSWORD:
-      return 'You changed your password';
+      return 'Şifreniz güncellendi';
     case ActivityType.DELETE_ACCOUNT:
-      return 'You deleted your account';
+      return 'Hesabınız silindi';
     case ActivityType.UPDATE_ACCOUNT:
-      return 'You updated your account';
+      return 'Hesap bilgileriniz güncellendi';
     case ActivityType.CREATE_TEAM:
-      return 'You created a new team';
+      return 'Yeni bir takım oluşturuldu';
     case ActivityType.REMOVE_TEAM_MEMBER:
-      return 'You removed a team member';
+      return 'Bir takım üyesi silindi';
     case ActivityType.INVITE_TEAM_MEMBER:
-      return 'You invited a team member';
+      return 'Bir takım üyesi davet edildi';
     case ActivityType.ACCEPT_INVITATION:
-      return 'You accepted an invitation';
+      return 'Bir davete katıldınız';
     default:
-      return 'Unknown action occurred';
+      return 'Bilinmeyen bir eylem gerçekleşti';
   }
 }
 
@@ -74,11 +74,11 @@ export default async function ActivityPage() {
   return (
     <section className="flex-1 p-4 lg:p-8">
       <h1 className="text-lg lg:text-2xl font-medium text-gray-900 mb-6">
-        Activity Log
+        Etkinlik Logu
       </h1>
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>Son Etkinlikler</CardTitle>
         </CardHeader>
         <CardContent>
           {logs.length > 0 ? (
@@ -111,11 +111,11 @@ export default async function ActivityPage() {
             <div className="flex flex-col items-center justify-center text-center py-12">
               <AlertCircle className="h-12 w-12 text-orange-500 mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                No activity yet
+                Henüz etkinlik yok
               </h3>
               <p className="text-sm text-gray-500 max-w-sm">
-                When you perform actions like signing in or updating your
-                account, they'll appear here.
+                Hesabınıza giriş yaparken veya hesap bilgilerinizi güncellerken
+                etkinlikleriniz burada görünecektir.
               </p>
             </div>
           )}

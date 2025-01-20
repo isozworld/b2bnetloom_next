@@ -1,6 +1,6 @@
 import { desc, and, eq, isNull } from 'drizzle-orm';
 import { db } from './drizzle';
-import { activityLogs, teamMembers, teams, users } from './schema';
+import { activityLogs, teamMembers, teams, users,cariRoles } from './schema';
 import { cookies } from 'next/headers';
 import { verifyToken } from '@/lib/auth/session';
 
@@ -45,7 +45,41 @@ export async function getTeamByStripeCustomerId(customerId: string) {
 
   return result.length > 0 ? result[0] : null;
 }
+// Kullanıcı rollerini getir
+export async function getCariRoles() {
+  return await db
+    .select({
+      id: cariRoles.id,
+      userId: cariRoles.userId,
+      netsisCariKod: cariRoles.netsisCariKod,
+      userRole: cariRoles.userRole,
+      userName: users.name,
+    })
+    .from(cariRoles)
+    .leftJoin(users, eq(cariRoles.userId, users.id));
+}
+// Kullanıcıları getir
+export async function getUsers() {
+  return await db.select({ id: users.id, name: users.name }).from(users);
+}
 
+// Yeni bir rol ekle
+export async function addCariRole({
+  userId,
+  netsisCariKod,
+  userRole,
+}: {
+  userId: number;
+  netsisCariKod: string;
+  userRole: string;
+}) {
+  await db.insert(cariRoles).values({ userId, netsisCariKod, userRole });
+}
+
+// Bir rolü sil
+export async function deleteCariRole(id: number) {
+  await db.delete(cariRoles).where(eq(cariRoles.id, id));
+}
 export async function updateTeamSubscription(
   teamId: number,
   subscriptionData: {

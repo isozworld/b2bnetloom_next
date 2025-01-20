@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   const teamData = await getTeamForUser(user.id);
 
   if (!teamData) {
-    throw new Error('Team not found');
+    throw new Error('Takım bulunamadı');
   }
 
   return <Settings teamData={teamData} />;

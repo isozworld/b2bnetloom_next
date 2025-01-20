@@ -1,7 +1,7 @@
 'use client';
-
+import { ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CircleIcon, Home, LogOut } from 'lucide-react';
 import {
@@ -26,6 +26,39 @@ function Header() {
     await signOut();
     router.push('/');
   }
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchCartItemCount() {
+      try {
+        const response = await fetch('/api/pages/userroles/shopping?methodname=getCart', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+console.log("response",response);
+        if (!response.ok) {
+          throw new Error(`Error fetching cart count: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("data",data);
+        setCartCount(data.count);
+      } catch (err: any) {
+        console.error(err);
+   
+      } finally {
+ 
+      }
+    }
+
+    fetchCartItemCount();
+  }, []);
+
+
+
+ 
 
   return (
     <header className="border-b border-gray-200">
@@ -37,13 +70,18 @@ function Header() {
       <span className="ml-2 text-xl font-semibold text-gray-900">B2B::NetLoom</span>
     </Link>
         <div className="flex items-center space-x-4">
-{/*           <Link
-            href="/pricing"
-            className="text-sm font-medium text-gray-700 hover:text-gray-900"
-          >
-            Pricing
-          </Link> */}
+        {user && (
+            <div className="relative flex items-center">
+              <Link href="/dashboard/orders/shoppingcarts">
+                <ShoppingCart className="w-6 h-6 text-gray-700 hover:text-gray-900 cursor-pointer" />
+              </Link>
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                 {cartCount} {/* Sepet adedi burada dinamik olarak güncellenebilir */}
+              </span>
+            </div>
+          )}
           {user ? (
+            
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer size-9">

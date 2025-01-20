@@ -65,7 +65,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   if (userWithTeam.length === 0) {
     return {
-      error: 'Invalid email or password. Please try again.',
+      error: 'Geçersiz email veya şifre. Lütfen tekrar deneyiniz.',
       email,
       password,
     };
@@ -80,7 +80,7 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
 
   if (!isPasswordValid) {
     return {
-      error: 'Invalid email or password. Please try again.',
+      error: 'Geçersiz email veya şifre. Lütfen tekrar deneyiniz.',
       email,
       password,
     };
@@ -117,7 +117,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   if (existingUser.length > 0) {
     return {
-      error: 'Failed to create user. Please try again.',
+      error: 'Kullanıcı oluşturulurken bir hata oluştu. Lütfen tekrar deneyiniz.',
       email,
       password,
     };
@@ -135,7 +135,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
 
   if (!createdUser) {
     return {
-      error: 'Failed to create user. Please try again.',
+      error: 'Kullanıcı oluşturulurken bir hata oluştu. Lütfen tekrar deneyiniz.',
       email,
       password,
     };
@@ -176,7 +176,7 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
         .where(eq(teams.id, teamId))
         .limit(1);
     } else {
-      return { error: 'Invalid or expired invitation.', email, password };
+      return { error: 'Geçersiz veya süresi dolmuş bir davet.', email, password };
     }
   } else {
     // Create a new team if there's no invitation
@@ -235,7 +235,7 @@ const updatePasswordSchema = z
     confirmPassword: z.string().min(8).max(100),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: "Şifreler eşleşmiyor",
     path: ['confirmPassword'],
   });
 
@@ -250,12 +250,12 @@ export const updatePassword = validatedActionWithUser(
     );
 
     if (!isPasswordValid) {
-      return { error: 'Current password is incorrect.' };
+      return { error: 'Mevcut şifre yanlış.' };
     }
 
     if (currentPassword === newPassword) {
       return {
-        error: 'New password must be different from the current password.',
+        error: 'Yeni şifre mevcut şifreden farklı olmalıdır.',
       };
     }
 
@@ -270,7 +270,7 @@ export const updatePassword = validatedActionWithUser(
       logActivity(userWithTeam?.teamId, user.id, ActivityType.UPDATE_PASSWORD),
     ]);
 
-    return { success: 'Password updated successfully.' };
+    return { success: 'Şifre başarıyla güncellendi.' };
   },
 );
 
@@ -285,7 +285,7 @@ export const deleteAccount = validatedActionWithUser(
 
     const isPasswordValid = await comparePasswords(password, user.passwordHash);
     if (!isPasswordValid) {
-      return { error: 'Incorrect password. Account deletion failed.' };
+      return { error: 'Şifre yanlış. Hesap silme işlemi başarısız.' };
     }
 
     const userWithTeam = await getUserWithTeam(user.id);

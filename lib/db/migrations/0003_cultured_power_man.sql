@@ -1,0 +1,1 @@
+ALTER TABLE "shopping_cart" ADD COLUMN "stock_code" varchar(50) NOT NULL;

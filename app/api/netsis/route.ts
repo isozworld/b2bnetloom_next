@@ -12,46 +12,25 @@ const NETSIS_DBTYPE = 0;
 let token: string | null = null; // Geçerli token
 let tokenExpiration: number | null = null; // Token süresi
 
-// Token al
-async function loginToNetsis() {
-  const url = `${BASE_URL}/api/v2/token`;
-  const body = new URLSearchParams({
-    grant_type: 'password',
-    branchcode: NETSIS_SUBE,
-    password: NETSIS_PASSWORD,
-    username: NETSIS_USER,
-    dbname: NETSIS_SIRKET,
-    dbuser: NETSIS_DBUSER,
-    dbpassword: NETSIS_DBPASSWORD,
-    dbtype: NETSIS_DBTYPE.toString(),
-  });
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: body.toString(),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Login failed: ${response.status} ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  token = data.access_token;
-  tokenExpiration = Date.now() + data.expires_in * 1000;
-}
 
 // Token kontrol ve yenileme
 async function ensureToken() {
   if (!token || !tokenExpiration || Date.now() >= tokenExpiration) {
-    await loginToNetsis();
+    console.log("Token expired, attempting to re-login...");
+    try {
+      await loginToNetsis();
+    } catch (error) {
+      console.error("Token renewal failed:", error);
+      throw new Error("Token renewal failed. Please check credentials or server.");
+    }
+  } else {
+    console.log("Token is still valid.");
   }
 }
 
 // Netsis API çağrısı
-async function callNetsisAPI(
+export async function callNetsisAPI(
   endpoint: string,
   method: string = 'GET',
   params?: Record<string, any>,
@@ -86,10 +65,16 @@ async function callNetsisAPI(
 
     const response = await fetch(url, requestOptions);
 
+    if (response.status === 401) {
+      console.warn("Unauthorized error. Attempting to refresh token...");
+      await loginToNetsis(); // Token yenile
+      return callNetsisAPI(endpoint, method, params, body, customHeaders); // Yeniden dene
+    }
+
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(
-        `Netsis API error: ${response.status} ${response.statusText}. Details: ${errorText}`
+        `Netsis API error callNetsisAPI: ${response.status} ${response.statusText}. Details: ${errorText} url:${url}`
       );
     }
 
@@ -99,6 +84,39 @@ async function callNetsisAPI(
     console.error("Error in callNetsisAPI:", error);
     throw error;
   }
+}
+
+// Token al
+async function loginToNetsis() {
+  const url = `${BASE_URL}/api/v2/token`;
+  const body = new URLSearchParams({
+    grant_type: 'password',
+    branchcode: NETSIS_SUBE,
+    password: NETSIS_PASSWORD,
+    username: NETSIS_USER,
+    dbname: NETSIS_SIRKET,
+    dbuser: NETSIS_DBUSER,
+    dbpassword: NETSIS_DBPASSWORD,
+    dbtype: NETSIS_DBTYPE.toString(),
+  });
+console.log(body);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: body.toString(),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Login failed: ${response.status} ${response.statusText}. Details: ${errorText}`);
+  }
+
+  const data = await response.json();
+  token = data.access_token;
+  tokenExpiration = Date.now() + data.expires_in * 1000; // expires yerine expires_in
+  //console.log("Token renewed successfully:", token);
 }
 
 // POST metodu

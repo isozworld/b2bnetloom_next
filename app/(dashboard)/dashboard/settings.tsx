@@ -26,29 +26,29 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
 
   return (
     <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
+      <h1 className="text-lg lg:text-2xl font-medium mb-6">Takım Ayarları</h1>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Team Subscription</CardTitle>
+          <CardTitle>Takım Aboneliği</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
               <div className="mb-4 sm:mb-0">
                 <p className="font-medium">
-                  Current Plan: {teamData.planName || 'Free'}
+                  Geçerli Plan: {teamData.planName || 'Ücretsiz'}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {teamData.subscriptionStatus === 'active'
-                    ? 'Billed monthly'
+                    ? 'Aylık faturalandırılıyor'
                     : teamData.subscriptionStatus === 'trialing'
-                      ? 'Trial period'
-                      : 'No active subscription'}
+                      ? 'Deneme dönemi'
+                      : 'Aktif bir abonelik yok'}
                 </p>
               </div>
               <form action={customerPortalAction}>
                 <Button type="submit" variant="outline">
-                  Manage Subscription
+                  Aboneliği Yönet
                 </Button>
               </form>
             </div>
@@ -57,7 +57,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
       </Card>
       <Card className="mb-8">
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle>Takım Üyeleri</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="space-y-4">
@@ -94,7 +94,7 @@ export function Settings({ teamData }: { teamData: TeamDataWithMembers }) {
                       size="sm"
                       disabled={isRemovePending}
                     >
-                      {isRemovePending ? 'Removing...' : 'Remove'}
+                      {isRemovePending ? 'Siliniyor...' : 'Sil'}
                     </Button>
                   </form>
                 ) : null}
